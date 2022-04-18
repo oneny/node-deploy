@@ -35,9 +35,9 @@ const upload = multer({
 
 router.post('/img', isLoggedIn, upload.single('img'), (req, res) => {
   console.log(req.file); // 업로드한 결과물이 req.file에 저장됨
-  const originalUrl = req.file.location;
+  const originalUrl = req.file.location; // 기존 주소
   // originalUrl의 /original/ 이였다가 리사이징 이후 /thumb/ 교체(-> 이동)
-  const url = originalUrl.replace(/\/original\//, '/thumb/');
+  const url = originalUrl.replace(/\/original\//, '/thumb/'); // 리사이징된 주소
   console.log(url, originalUrl);
   res.json({ url, originalUrl });
 });

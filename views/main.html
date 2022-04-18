@@ -58,7 +58,9 @@
         formData.append('img', this.files[0]);
         axios.post('/post/img', formData)
           .then((res) => {
+            // 업로드는 리사이징으로
             document.getElementById('img-url').value = res.data.url; // 리사이징 url
+            // 미리 보기는 원본으로(* 리사이징 전이므로 원본으로 표시)
             document.getElementById('img-preview').src = res.data.originalUrl; // 기존 url
             document.getElementById('img-preview').style.display = 'inline';
           })
