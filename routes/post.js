@@ -30,12 +30,16 @@ const upload = multer({
       cb(null, `original/${Date.now()}${path.basename(file.originalname)}`);
     },
   }),
-  limits: { fileSize: 5 * 1024 * 1024 }
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
 
 router.post('/img', isLoggedIn, upload.single('img'), (req, res) => {
   console.log(req.file); // 업로드한 결과물이 req.file에 저장됨
-  res.json({ url: req.file.location });
+  const originalUrl = req.file.location;
+  // originalUrl의 /original/ 이였다가 리사이징 이후 /thumb/ 교체(-> 이동)
+  const url = originalUrl.replace(/\/original\//, '/thumb/');
+  console.log(url, originalUrl);
+  res.json({ url, originalUrl });
 });
 
 const upload2 = multer();
