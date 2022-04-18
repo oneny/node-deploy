@@ -35,12 +35,13 @@ const upload = multer({
 
 router.post('/img', isLoggedIn, upload.single('img'), (req, res) => {
   console.log(req.file); // 업로드한 결과물이 req.file에 저장됨
-  res.json({ url, originalUrl });
+  res.json({ url: req.file.location });
 });
 
 const upload2 = multer();
 router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
   try {
+    console.log(req.user);
     const post = await Post.create({
       content: req.body.content,
       img: req.body.url,
@@ -48,15 +49,14 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
     });
     const hashtags = req.body.content.match(/#[^\s#]*/g);
     if (hashtags) {
-      const result = await Promise.all( // 모든 엘리먼트 순서대로 promise 실행
-        hashtags.map(tag => { // 매 엘리먼트마다
-          return Hashtag.findOrCreate({ // DB에 입력한 hashtag가 있으면 조회 없으면 생성
-            where: { title: tag.slice(1).toLowerCase() }, // 앞에 #을 제거하고 소문자로 변환
+      const result = await Promise.all(
+        hashtags.map(tag => {
+          return Hashtag.findOrCreate({
+            where: { title: tag.slice(1).toLowerCase() },
           })
         }),
       );
-      console.log(result);
-      await post.addHashtags(result.map(r => r[0])); // 2차원 배열에서 각 엘리먼트마다는 1차원이고 0번 인덱스를 가져와서 addHashtags
+      await post.addHashtags(result.map(r => r[0]));
     }
     res.redirect('/');
   } catch (error) {
